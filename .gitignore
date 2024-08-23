@@ -1,0 +1,24 @@
+# Maven build directory
+target/
+
+# Maven wrapper
+.mvn/
+mvnw
+mvnw.cmd
+
+# Runtime data files
+*.dat
+
+# Configuration files (if they contain sensitive or environment-specific info)
+chatbot_settings.properties
+
+# Logs, temporary files, etc.
+*.log
+
+# Whatsapp data 
+whatsapp/node_modules/
+whatsapp/status.txt
+whatsapp/qrcode.png
+whatsapp/userData/
+whatsapp/.wwebjs_auth/
+whatsapp/.wwebjs_cache/

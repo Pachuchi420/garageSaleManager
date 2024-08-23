@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cc.pachuchi.garagesalemanager.whatsAppDialogController">
+   <children>
+      <Label layoutX="90.0" layoutY="256.0" text="Scan the QR code" />
+      <Label layoutX="24.0" layoutY="290.0" text="Status: " />
+      <Label fx:id="logStatus" layoutX="68.0" layoutY="290.0" text="Waiting for connection...." textFill="#ed9600" />
+      <HBox alignment="CENTER" layoutY="363.0" prefHeight="35.0" prefWidth="606.0" spacing="40.0">
+         <children>
+            <Button fx:id="cancelButton" mnemonicParsing="false" text="Ok" />
+            <Button fx:id="testMsg" mnemonicParsing="false" text="Send Test Message" />
+         </children>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </HBox>
+      <AnchorPane layoutX="24.0" layoutY="11.0" prefHeight="124.0" prefWidth="156.0" style="-fx-background-color: e9e9e9; -fx-background-radius: 5; -fx-border-color: e9e9e9; -fx-border-radius: 5;">
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+         <children>
+            <ImageView fx:id="whatsappQRCode" fitHeight="218.0" fitWidth="235.0" layoutX="10.0" layoutY="9.0" pickOnBounds="true" preserveRatio="true" />
+         </children>
+      </AnchorPane>
+      <VBox layoutX="286.0" layoutY="14.0" prefHeight="330.0" prefWidth="306.0">
+         <children>
+            <HBox prefHeight="32.0" prefWidth="306.0" spacing="10.0">
+               <children>
+                  <Label text="Recipient ID: ">
+                     <HBox.margin>
+                        <Insets top="3.0" />
+                     </HBox.margin>
+                  </Label>
+                  <TextField fx:id="recipientID" promptText="unique for each contact" />
+               </children>
+            </HBox>
+            <HBox prefHeight="40.0" prefWidth="306.0" spacing="38.0">
+               <children>
+                  <Label text="Interval:">
+                     <HBox.margin>
+                        <Insets top="3.0" />
+                     </HBox.margin>
+                  </Label>
+                  <TextField fx:id="intervalMinutes" promptText="in minutes" />
+               </children>
+            </HBox>
+            <HBox prefHeight="50.0" prefWidth="306.0">
+               <children>
+                  <Label prefHeight="17.0" prefWidth="183.0" text="Start Time:">
+                     <HBox.margin>
+                        <Insets top="3.0" />
+                     </HBox.margin>
+                  </Label>
+                  <HBox prefHeight="32.0" prefWidth="324.0" spacing="10.0">
+                     <children>
+                        <ComboBox fx:id="startTimeHour" prefHeight="25.0" prefWidth="78.0" promptText="Hour" />
+                        <ComboBox fx:id="startTimeMinute" prefHeight="25.0" prefWidth="92.0" promptText="Minutes" />
+                     </children>
+                  </HBox>
+               </children>
+            </HBox>
+            <HBox prefHeight="52.0" prefWidth="306.0">
+               <children>
+                  <Label prefHeight="17.0" prefWidth="183.0" text="End Time:">
+                     <HBox.margin>
+                        <Insets top="3.0" />
+                     </HBox.margin>
+                  </Label>
+                  <HBox prefHeight="32.0" prefWidth="324.0" spacing="10.0">
+                     <children>
+                        <ComboBox fx:id="endTimeHour" prefHeight="25.0" prefWidth="78.0" promptText="Hour" />
+                        <ComboBox fx:id="endTimeMinute" prefHeight="25.0" prefWidth="92.0" promptText="Minutes" />
+                     </children>
+                  </HBox>
+               </children>
+            </HBox>
+            <HBox prefHeight="35.0" prefWidth="306.0" spacing="10.0">
+               <children>
+                  <Label text="Chat Bot:">
+                     <font>
+                        <Font name="System Bold" size="13.0" />
+                     </font>
+                     <padding>
+                        <Insets top="3.0" />
+                     </padding>
+                  </Label>
+                  <ToggleButton fx:id="activeToggleButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="77.0" style="-fx-background-color: #bc1919; -fx-background-radius: 6;" text="Disabled" textFill="WHITE" />
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="42.0" prefWidth="306.0">
+               <children>
+                  <Button fx:id="saveSettings" mnemonicParsing="false" text="Save Settings" />
+               </children>
+            </HBox>
+         </children></VBox>
+   </children>
+</AnchorPane>
