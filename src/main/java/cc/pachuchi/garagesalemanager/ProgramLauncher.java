@@ -50,7 +50,6 @@ public class ProgramLauncher extends Application {
 
             stage.setOnCloseRequest(event -> {
                 stopWhatsAppScript();
-                Platform.exit();
             });
 
         } catch (Exception e) {
@@ -169,7 +168,7 @@ public class ProgramLauncher extends Application {
                     break;
                 }
                 try {
-                    sendRandomItemMessage(chatBot.getRecipientID());
+                    sendRandomItemMessage(chatBot.getRecipientContact());
                     Thread.sleep(chatBot.getIntervalInMilliseconds());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -195,24 +194,38 @@ public class ProgramLauncher extends Application {
     private void sendRandomItemMessage(String recipientId) throws Exception {
         List<Item> items = storage.getItems();
         Random rand = new Random();
-
         if (items.size() > 0) {
-            int randomIndex = rand.nextInt(items.size());
-            Item randomItem = items.get(randomIndex);
+            boolean sent = false;
+            int attempts = 0;
+            while (!sent && attempts < items.size()) {
+                int randomIndex = rand.nextInt(items.size());
+                Item randomItem = items.get(randomIndex);
 
-            String base64Image = Base64.getEncoder().encodeToString(randomItem.getImageData());
+                // Check if the item is not reserved, not sold, and hasn't been uploaded today
+                if (!randomItem.isReserved() && !randomItem.getSold() && !randomItem.uploadedToday()) {
+                    String base64Image = Base64.getEncoder().encodeToString(randomItem.getImageData());
 
-            String jsonInputString = "{"
-                    + "\"name\": \"" + randomItem.getName() + "\", "
-                    + "\"description\": \"" + randomItem.getDescription() + "\", "
-                    + "\"price\": " + randomItem.getPrice() + ", "
-                    + "\"imageData\": \"" + base64Image + "\", "
-                    + "\"imageMimeType\": \"" + "image/png" + "\", "
-                    + "\"imageFilename\": \"" + "itemImage.png" + "\", "
-                    + "\"recipientId\": \"" + recipientId + "\""
-                    + "}";
+                    String jsonInputString = "{"
+                            + "\"name\": \"" + randomItem.getName() + "\", "
+                            + "\"description\": \"" + randomItem.getDescription() + "\", "
+                            + "\"price\": \"" + randomItem.getPrice() + " " + randomItem.getCurrency() + "\", "
+                            + "\"imageData\": \"" + base64Image + "\", "
+                            + "\"imageMimeType\": \"" + "image/png" + "\", "
+                            + "\"imageFilename\": \"" + "itemImage.png" + "\", "
+                            + "\"recipientId\": \"" + recipientId + "\""
+                            + "}";
 
-            sendItemMessage(jsonInputString, recipientId);
+                    sendItemMessage(jsonInputString, recipientId);
+                    randomItem.setUploadedDate(); // Set the upload date to today
+                    sent = true; // Message sent successfully, exit the loop
+                } else {
+                    attempts++;
+                }
+            }
+
+            if (!sent) {
+                System.out.println("No available items to send.");
+            }
         } else {
             System.out.println("No items available to send.");
         }

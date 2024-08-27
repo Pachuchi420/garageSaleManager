@@ -39,6 +39,8 @@ public class addItemDialogController {
     @FXML
     private RadioButton currencyEUR;
     @FXML
+    private Label duplicateWarning;
+    @FXML
     private Label currencyWarning;
     @FXML
     private Button selectImageButton;
@@ -67,34 +69,33 @@ public class addItemDialogController {
         // Check if the string contains at least one letter
         return str.matches(".*[a-zA-Z]+.*");
     }
-    public void addItem(){
+    public void addItem() {
         String name = nameField.getText();
         String description = descriptionField.getText();
         String priceAsString = priceField.getText();
         int price = 0;
 
-        if (name.isEmpty()){
+        if (name.isEmpty()) {
             nameWarning.setText("Can't be empty");
             Effects.fadeOutText(nameWarning, 1.5);
             return;
         }
 
-        if (description.isEmpty()){
+        if (description.isEmpty()) {
             descriptionWarning.setText("Can't be empty");
             Effects.fadeOutText(descriptionWarning, 1.5);
             return;
         }
 
-        if (priceAsString.isEmpty()){
+        if (priceAsString.isEmpty()) {
             priceWarning.setText("Price cannot be empty");
             Effects.fadeOutText(priceWarning, 1.5);
             return;
         }
 
-
-        if (!containsNonNumeric(priceAsString)){
+        if (!containsNonNumeric(priceAsString)) {
             price = Integer.parseInt(priceAsString);
-            if (price <= 0){
+            if (price <= 0) {
                 priceWarning.setText("Price can only be positive values.");
                 Effects.fadeOutText(priceWarning, 1.5);
                 return;
@@ -115,12 +116,29 @@ public class addItemDialogController {
         } else {
             currencyWarning.setText("Select a currency");
             Effects.fadeOutText(currencyWarning, 1.5);
+            return;
+        }
+
+        // Check for duplicate image
+        if (isDuplicateImage(imageData)) {
+            duplicateWarning.setText("Duplicate image!");
+            Effects.fadeOutText(duplicateWarning, 1.5);
+            return;
         }
 
         Item newItem = new Item(name, description, imageData, price, currency);
         storage.addItem(newItem);
         Stage stage = (Stage) confirmButton.getScene().getWindow();
         stage.close();
+    }
+
+    private boolean isDuplicateImage(byte[] imageData) {
+        for (Item item : storage.getItems()) {  // Assuming storage has a method to get all items
+            if (item.getImageData() != null && java.util.Arrays.equals(item.getImageData(), imageData)) {
+                return true; // Found a duplicate image
+            }
+        }
+        return false; // No duplicate found
     }
 
     public void cancelAction(){

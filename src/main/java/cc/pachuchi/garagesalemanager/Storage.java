@@ -57,7 +57,7 @@ public class Storage {
     public void saveChatBotSettings(ChatBot chatBot) {
         Properties properties = new Properties();
 
-        properties.setProperty("recipientID", chatBot.getRecipientID());
+        properties.setProperty("recipientID", chatBot.getRecipientContact());
         properties.setProperty("intervalMinutes", String.valueOf(chatBot.getIntervalMinutes()));
         properties.setProperty("startTime", chatBot.getStartTime());
         properties.setProperty("endTime", chatBot.getEndTime());

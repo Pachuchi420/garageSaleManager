@@ -30,10 +30,26 @@ function deleteUserData() {
     }
 }
 
-client.on('ready', () => {
+client.on('ready', async () => {
     console.log('Client is ready with ID: ' + client.info.wid._serialized);
     updateStatus('connected');
-    sendTestMessage("Hello, this is a test message!", "<recipient_id>");
+
+    // Replace 'Group Name' with the exact name of your WhatsApp group
+    const groupName = 'MySpace';
+
+    // Fetch all chats
+    const chats = await client.getChats();
+
+    // Find the group chat by its name
+    const groupChat = chats.find(chat => chat.isGroup && chat.name === groupName);
+
+    if (groupChat) {
+        console.log(`Chat ID for group '${groupName}': ${groupChat.id._serialized}`);
+    } else {
+        console.log(`Group '${groupName}' not found.`);
+    }
+
+
 });
 
 client.on('authenticated', () => {
@@ -79,27 +95,47 @@ function sendTestMessage(customMessage, recipientId) {
     }
 }
 
+// Function to get the contact ID by name
+async function getContactID(contactName) {
+    const contacts = await client.getContacts();
+    const contact = contacts.find(contact => contact.pushname === contactName || contact.name === contactName);
+    if (contact) {
+        return contact.id._serialized;
+    } else {
+        console.error(`Contact '${contactName}' not found.`);
+        return null;
+    }
+}
+
 // Function to send an item message with image, name, description, and price as a caption
-function sendItemMessage(item, recipientId) {
+async function sendItemMessage(item, recipientContactName) {
     if (client.info && client.info.wid) {
-        // Create the caption with the item details
-        const caption = `*Item:* ${item.name}\n*Description:* ${item.description}\n*Price:* ${item.price}`;
+        // Get the recipient's ID using the contact name
+        const recipientId = await getContactID(recipientContactName);
 
-        // Create a MessageMedia object from the base64 image data
-        const media = new MessageMedia(item.imageMimeType, item.imageData, item.imageFilename);
+        if (recipientId) {
+            // Create the caption with the item details
+            const caption = `${item.name}\n${item.description}\n${item.price}`;
 
-        // Send the image with the caption
-        client.sendMessage(recipientId, media, { caption: caption })
-            .then(response => {
-                console.log(`Item message sent successfully with name: ${item.name}`);
-            })
-            .catch(err => {
-                console.error('Failed to send item image', err);
-            });
+            // Create a MessageMedia object from the base64 image data
+            const media = new MessageMedia(item.imageMimeType, item.imageData, item.imageFilename);
+
+            // Send the image with the caption
+            client.sendMessage(recipientId, media, { caption: caption })
+                .then(response => {
+                    console.log(`Item message sent successfully with name: ${item.name}`);
+                })
+                .catch(err => {
+                    console.error('Failed to send item image', err);
+                });
+        }
     } else {
         console.log('Client is not ready to send item messages');
     }
 }
+
+
+
 
 // HTTP server to handle requests from JavaFX application
 const hostname = '127.0.0.1';

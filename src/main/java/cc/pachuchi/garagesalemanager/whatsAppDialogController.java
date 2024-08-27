@@ -98,7 +98,7 @@ public class whatsAppDialogController {
     private void loadChatBotSettings() {
         ChatBot chatBot = storage.loadChatBotSettings();
 
-        recipientID.setText(chatBot.getRecipientID());
+        recipientID.setText(chatBot.getRecipientContact());
         intervalMinutes.setText(String.valueOf(chatBot.getIntervalMinutes()));
 
         // Handle startTime
@@ -148,7 +148,7 @@ public class whatsAppDialogController {
         storage.saveChatBotSettings(chatBot);  // Save settings to storage
 
         System.out.println("Settings saved to ChatBot:");
-        System.out.println("Recipient ID: " + chatBot.getRecipientID());
+        System.out.println("Recipient ID: " + chatBot.getRecipientContact());
         System.out.println("Interval Minutes: " + chatBot.getIntervalMinutes());
         System.out.println("Start Time: " + chatBot.getStartTime());
         System.out.println("End Time: " + chatBot.getEndTime());

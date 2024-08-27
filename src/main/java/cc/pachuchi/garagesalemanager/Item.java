@@ -20,14 +20,11 @@ public class Item implements Serializable {
     private int price;
     private String currency;
     private final LocalDateTime date;
-    private  LocalDate reservationDate;
     private Boolean sold;
-
-
 
     private Reservation reservation = new Reservation(null, null, null, false);
 
-
+    private LocalDate uploadDate;
 
 
 
@@ -41,7 +38,7 @@ public class Item implements Serializable {
         this.currency = currency;
         this.date = LocalDateTime.now();
         this.sold = false;
-        this.reservationDate = null;
+        this.uploadDate = null;
     }
 
     private String makeUniqueID(){
@@ -124,12 +121,29 @@ public class Item implements Serializable {
 
     public Reservation getReservation(){return reservation;}
 
-    public Boolean checkReservation(){
+    public Boolean isReserved(){
         return reservation.getReserved();
     }
 
+    public Boolean uploadedToday() {
+        if (this.uploadDate != null && this.uploadDate.isEqual(LocalDate.now())) {
+            System.out.println("Item already uploaded today, skipping...");
+            return true;
+        } else if (this.uploadDate != null && this.uploadDate.isBefore(LocalDate.now())) {
+            System.out.println("Item was uploaded in the past, uploading again...");
+            return false;
+        } else {
+            System.out.println("Item has never been uploaded, uploading...");
+            return false;
+        }
+    }
 
-    public void undoReservation(){
 
+    public void resetUploadDate(){
+        this.uploadDate = null;
+    }
+
+    public void setUploadedDate(){
+        this.uploadDate = LocalDate.now();
     }
 }

@@ -95,7 +95,7 @@ public class listItemsViewController {
             }
         });
 
-        itemReservedColumn.setCellValueFactory(cellData -> new SimpleBooleanProperty(cellData.getValue().checkReservation()));
+        itemReservedColumn.setCellValueFactory(cellData -> new SimpleBooleanProperty(cellData.getValue().isReserved()));
         itemReservedColumn.setCellFactory(col -> new TableCell<Item, Boolean>() {
             @Override
             protected void updateItem(Boolean reserved, boolean empty) {

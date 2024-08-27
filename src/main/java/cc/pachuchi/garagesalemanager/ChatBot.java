@@ -8,7 +8,7 @@ public class ChatBot {
     private static ChatBot instance;
 
     // Fields to store ChatBot settings
-    private String recipientID;
+    private String recipientContact;
     private int intervalMinutes;
     private String startTime;  // Stored as "HH:mm"
     private String endTime;    // Stored as "HH:mm"
@@ -32,12 +32,12 @@ public class ChatBot {
     }
 
     // Getters and Setters
-    public String getRecipientID() {
-        return recipientID;
+    public String getRecipientContact() {
+        return recipientContact;
     }
 
     public void setRecipientID(String recipientID) {
-        this.recipientID = recipientID;
+        this.recipientContact = recipientID;
     }
 
     public int getIntervalMinutes() {
@@ -89,7 +89,7 @@ public class ChatBot {
     @Override
     public String toString() {
         return "ChatBot{" +
-                "recipientID='" + recipientID + '\'' +
+                "recipientID='" + recipientContact + '\'' +
                 ", intervalMinutes=" + intervalMinutes +
                 ", startTime='" + startTime + '\'' +
                 ", endTime='" + endTime + '\'' +
