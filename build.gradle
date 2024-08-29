@@ -67,7 +67,10 @@ distributions {
                 duplicatesStrategy = DuplicatesStrategy.EXCLUDE
             }
             from('whatsapp') {
-                into 'bin/whatsapp'
+                into 'bin/whatsapp' // Ensure the whatsapp directory is inside bin
+            }
+            from('src/main/resources') { // If you have resources like .fxml or other needed files
+                into 'bin'
             }
         }
     }
@@ -78,6 +81,10 @@ startScripts {
         def opts = "--module-path \$APP_HOME/lib --add-modules javafx.controls,javafx.fxml"
         unixScript.text = unixScript.text.replace('DEFAULT_JVM_OPTS=""', "DEFAULT_JVM_OPTS=\"$opts\"")
         windowsScript.text = windowsScript.text.replace('set DEFAULT_JVM_OPTS=', "set DEFAULT_JVM_OPTS=$opts")
+
+        // Ensure the working directory is set to the application home directory
+        unixScript.text = unixScript.text.replace('exec "$JAVACMD"', 'cd "$APP_HOME/bin"\nexec "$JAVACMD"')
+        windowsScript.text = windowsScript.text.replace('"%JAVA_EXE%" %DEFAULT_JVM_OPTS%', 'cd "%APP_HOME%\\bin" & "%JAVA_EXE%" %DEFAULT_JVM_OPTS%')
     }
 }
 
