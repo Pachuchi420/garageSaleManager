@@ -1,0 +1,95 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'application'
+    id 'com.github.node-gradle.node' version '3.0.1'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.openjfx:javafx-controls:17.0.2'
+    implementation 'org.openjfx:javafx-fxml:17.0.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+group = 'cc.pachuchi'
+version = '1.0.0'
+description = 'garageSaleManager'
+java.sourceCompatibility = JavaVersion.VERSION_21
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
+
+javafx {
+    version = "22.0.1"
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(Javadoc) {
+    options.encoding = 'UTF-8'
+}
+
+node {
+    version = '22.6.0'
+    download = true
+}
+
+application {
+    mainClass = 'cc.pachuchi.garagesalemanager.ProgramLauncher'
+}
+
+jar {
+    from('whatsapp') {
+        into('whatsapp')
+    }
+}
+
+distributions {
+    main {
+        contents {
+            from('build/libs') {
+                into 'lib'
+                duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+            }
+            from('whatsapp') {
+                into 'bin/whatsapp'
+            }
+        }
+    }
+}
+
+startScripts {
+    doLast {
+        def opts = "--module-path \$APP_HOME/lib --add-modules javafx.controls,javafx.fxml"
+        unixScript.text = unixScript.text.replace('DEFAULT_JVM_OPTS=""', "DEFAULT_JVM_OPTS=\"$opts\"")
+        windowsScript.text = windowsScript.text.replace('set DEFAULT_JVM_OPTS=', "set DEFAULT_JVM_OPTS=$opts")
+    }
+}
+
+task installNodeDependencies(type: NpmTask) {
+    args = ['install']
+    workingDir = file('whatsapp')
+}
+
+task runNodeScript(type: NodeTask) {
+    dependsOn installNodeDependencies
+    script = file('whatsapp/main.js')
+    workingDir = file('whatsapp')
+}
+
+run.dependsOn runNodeScript

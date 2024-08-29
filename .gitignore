@@ -1,6 +1,9 @@
 # Maven build directory
 target/
 
+# Gradle build directory
+build/
+
 # Maven wrapper
 .mvn/
 mvnw
@@ -16,9 +19,9 @@ chatbot_settings.properties
 *.log
 
 # Whatsapp data 
-whatsapp/node_modules/
 whatsapp/status.txt
 whatsapp/qrcode.png
 whatsapp/userData/
 whatsapp/.wwebjs_auth/
 whatsapp/.wwebjs_cache/
+whatsapp/node_modules/
