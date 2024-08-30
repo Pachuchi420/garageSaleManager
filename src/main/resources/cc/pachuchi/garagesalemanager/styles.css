@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'Material Symbols Outlined';
+    src: url('/cc/pachuchi/garagesalemanager/fonts/MaterialSymbolsOutlined-Regular.ttf'); /* Adjust the path as needed */
+}
+
+.material-symbols {
+    -fx-font-family: 'Material Symbols Outlined';
+    -fx-font-size: 24px; /* Adjust the size based on your design */
+}

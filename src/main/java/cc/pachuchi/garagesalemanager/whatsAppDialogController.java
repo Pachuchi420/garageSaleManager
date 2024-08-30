@@ -7,17 +7,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class whatsAppDialogController {
     private Storage storage;
-    private Thread qrGenerationThread;
-    private Thread statusCheckThread;
     private AtomicBoolean isDialogOpen = new AtomicBoolean(true);
 
     @FXML
@@ -44,23 +40,18 @@ public class whatsAppDialogController {
     private ToggleButton activeToggleButton;
     @FXML
     private Button saveSettings;
-
-    private final String id = "5215520815848@c.us";
-    private final String msg = "Hello World!";
+    @FXML
+    private Button refreshQRButton;
+    private ChatBot localBot;
 
     public void initialize() {
-        storage = new Storage();  // Initialize storage
+        localBot = ChatBot.getInstance();
+        startChecking();
 
-        loadChatBotSettings();  // Load settings when the dialog is opened
+        storage = new Storage();  // Initialize storage
+        loadChatBotSettings();
 
         cancelButton.setOnAction(event -> cancelAction());
-        testMsg.setOnAction(event -> {
-            try {
-                sendTestMessage(msg, id);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
 
         activeToggleButton.setOnAction(event -> {
             if (activeToggleButton.isSelected()) {
@@ -73,6 +64,8 @@ public class whatsAppDialogController {
         });
 
         saveSettings.setOnAction(event -> saveChatBotSettings());
+        testMsg.setOnAction(actionEvent -> sendTestMsg());
+        refreshQRButton.setOnAction(actionEvent -> refreshQR());
 
         // Populate hours
         for (int i = 0; i < 24; i++) {
@@ -88,71 +81,8 @@ public class whatsAppDialogController {
             endTimeMinute.getItems().add(minute);
         }
 
-        // Load and monitor QR Code
-        startQRGenerationThread();
-
-        // Start a thread to check the connection status
-        startStatusCheckThread();
-    }
-
-    private void loadChatBotSettings() {
-        ChatBot chatBot = storage.loadChatBotSettings();
-
-        recipientID.setText(chatBot.getRecipientContact());
-        intervalMinutes.setText(String.valueOf(chatBot.getIntervalMinutes()));
-
-        // Handle startTime
-        String startTime = chatBot.getStartTime();
-        if (startTime != null && !startTime.isEmpty()) {
-            String[] startTimeParts = startTime.split(":");
-            startTimeHour.setValue(startTimeParts[0]);
-            startTimeMinute.setValue(startTimeParts[1]);
-        } else {
-            // Provide default values or handle the case when startTime is null
-            startTimeHour.setValue("00");
-            startTimeMinute.setValue("00");
-        }
-
-        // Handle endTime
-        String endTime = chatBot.getEndTime();
-        if (endTime != null && !endTime.isEmpty()) {
-            String[] endTimeParts = endTime.split(":");
-            endTimeHour.setValue(endTimeParts[0]);
-            endTimeMinute.setValue(endTimeParts[1]);
-        } else {
-            // Provide default values or handle the case when endTime is null
-            endTimeHour.setValue("00");
-            endTimeMinute.setValue("00");
-        }
-
-        activeToggleButton.setSelected(chatBot.isActive());
-
-        if (chatBot.isActive()) {
-            activeToggleButton.setText("Enabled");
-            activeToggleButton.setStyle("-fx-background-color: green; -fx-text-fill: white;");
-        } else {
-            activeToggleButton.setText("Disabled");
-            activeToggleButton.setStyle("-fx-background-color: #bc1919; -fx-text-fill: white;");
-        }
-    }
-
-    private void saveChatBotSettings() {
-        ChatBot chatBot = ChatBot.getInstance();
-
-        chatBot.setRecipientID(recipientID.getText());
-        chatBot.setIntervalMinutes(Integer.parseInt(intervalMinutes.getText()));
-        chatBot.setStartTime(startTimeHour.getValue() + ":" + startTimeMinute.getValue());
-        chatBot.setEndTime(endTimeHour.getValue() + ":" + endTimeMinute.getValue());
-        chatBot.setActive(activeToggleButton.isSelected());
-
-        storage.saveChatBotSettings(chatBot);  // Save settings to storage
-
-        System.out.println("Settings saved to ChatBot:");
-        System.out.println("Recipient ID: " + chatBot.getRecipientContact());
-        System.out.println("Interval Minutes: " + chatBot.getIntervalMinutes());
-        System.out.println("Start Time: " + chatBot.getStartTime());
-        System.out.println("End Time: " + chatBot.getEndTime());
-        System.out.println("Active: " + chatBot.isActive());
+        // Start checking for connection status and QR code updates
+        startChecking();
     }
 
     public void cancelAction() {
@@ -164,85 +94,173 @@ public class whatsAppDialogController {
         stage.close();
     }
 
-    private void startQRGenerationThread() {
-        qrGenerationThread = new Thread(() -> {
+    public void setStorage(Storage storage) {
+        this.storage = storage;
+    }
+
+    public void saveChatBotSettings() {
+        try {
+            // Retrieve data from UI components
+            String recipient = recipientID.getText();
+            int interval = Integer.parseInt(intervalMinutes.getText());
+            int startTimeHourValue = Integer.parseInt(startTimeHour.getValue());
+            int startTimeMinutesValue = Integer.parseInt(startTimeMinute.getValue());
+            int endTimeHourValue = Integer.parseInt(endTimeHour.getValue());
+            int endTimeMinutesValue = Integer.parseInt(endTimeMinute.getValue());
+            boolean isActive = activeToggleButton.isSelected();
+
+            // Check if the chat exists
+            if (localBot.getApi().store().findChatByName(recipient).isPresent()) {
+                localBot.setRecipientName(recipient);
+                System.out.println("Found recipient '" + recipient + "' with ID: " + localBot.getApi().store().findChatByName(recipient).get());
+            } else {
+                // If the recipient is not found, throw an exception
+                throw new NoSuchElementException("Recipient '" + recipient + "' not found");
+            }
+
+            // Set other ChatBot properties
+            localBot.setInterval(interval);
+            localBot.setStartTimeHour(startTimeHourValue);
+            localBot.setStartTimeMinutes(startTimeMinutesValue);
+            localBot.setEndTimeHour(endTimeHourValue);
+            localBot.setEndTimeMinutes(endTimeMinutesValue);
+            localBot.setEnabled(isActive);
+
+            localBot.saveState();
+
+            // Debug/confirmation messages
+            System.out.println("Contact saved: " + recipient);
+            System.out.println("Interval saved: " + interval + " minutes");
+            System.out.println("Start Time saved: " + startTimeHourValue + ":" + startTimeMinutesValue);
+            System.out.println("End Time saved: " + endTimeHourValue + ":" + endTimeMinutesValue);
+            System.out.println("Chat Bot Active: " + (isActive ? "Yes" : "No"));
+
+        } catch (NumberFormatException e) {
+            // Handle case where intervalMinutes is not a valid integer
+            System.out.println("Invalid interval or time values.");
+            showAlert("Invalid input", "Please enter valid numbers for the interval and time fields.");
+        } catch (NoSuchElementException e) {
+            // Handle case where the recipient was not found
+            System.out.println(e.getMessage());
+            showAlert("Recipient Not Found", e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Error", "An unexpected error occurred: " + e.getMessage());
+        }
+    }
+
+
+    public void loadChatBotSettings() {
+        try {
+            // Load the data from the localBot object
+            String recipient = localBot.getRecipientName();
+            int interval = localBot.getInterval();
+            int startTimeHourValue = localBot.getStartTimeHour();
+            int startTimeMinutesValue = localBot.getStartTimeMinutes();
+            int endTimeHourValue = localBot.getEndTimeHour();
+            int endTimeMinutesValue = localBot.getEndTimeMinutes();
+            boolean isActive = localBot.isEnabled();
+
+            // Set the data into UI components
+            recipientID.setText(recipient);
+            intervalMinutes.setText(String.valueOf(interval));
+            startTimeHour.setValue(String.format("%02d", startTimeHourValue));
+            startTimeMinute.setValue(String.format("%02d", startTimeMinutesValue));
+            endTimeHour.setValue(String.format("%02d", endTimeHourValue));
+            endTimeMinute.setValue(String.format("%02d", endTimeMinutesValue));
+            activeToggleButton.setSelected(isActive);
+
+            // Update the toggle button text and style based on its state
+            if (isActive) {
+                activeToggleButton.setText("Enabled");
+                activeToggleButton.setStyle("-fx-background-color: green; -fx-text-fill: white;");
+            } else {
+                activeToggleButton.setText("Disabled");
+                activeToggleButton.setStyle("-fx-background-color: #bc1919; -fx-text-fill: white;");
+            }
+
+            // Debug/confirmation messages
+            System.out.println("Settings loaded: ");
+            System.out.println("Contact: " + recipient);
+            System.out.println("Interval: " + interval + " minutes");
+            System.out.println("Start Time: " + startTimeHourValue + ":" + startTimeMinutesValue);
+            System.out.println("End Time: " + endTimeHourValue + ":" + endTimeMinutesValue);
+            System.out.println("Chat Bot Active: " + (isActive ? "Yes" : "No"));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Load Error", "Failed to load chatbot settings. Please check the logs for more details.");
+        }
+    }
+
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void updateConnectionStatus() {
+        if (localBot.isConnected()) {
+            logStatus.setText("Connected");
+            logStatus.setStyle("-fx-text-fill: green;");
+            refreshQRButton.setDisable(true);
+        } else {
+            logStatus.setText("Disconnected");
+            logStatus.setStyle("-fx-text-fill: red;");
+            refreshQRButton.setDisable(false);
+        }
+    }
+
+    private void setQrCodeImageView() {
+        Path qrCodePath = localBot.getQrCodePath();
+        if (qrCodePath != null && Files.exists(qrCodePath)) {
+            if (localBot.isConnected()) {
+                whatsappQRCode.setImage(null);
+            } else {
+                Image qrImage = new Image(qrCodePath.toUri().toString());
+                whatsappQRCode.setImage(qrImage);
+            }
+        }
+    }
+
+    public void startChecking() {
+        Thread checkerThread = new Thread(() -> {
             while (isDialogOpen.get()) {
+                Platform.runLater(() -> {
+                    updateConnectionStatus();
+                    setQrCodeImageView();
+                });
                 try {
-                    // Generate QR Code image
-                    Image qrCodeImage = generateQRCode();
-
-                    // Update ImageView on the JavaFX Application Thread
-                    Platform.runLater(() -> whatsappQRCode.setImage(qrCodeImage));
-
-                    // Wait before regenerating the QR code (if needed)
-                    Thread.sleep(5000); // Adjust the delay as necessary
+                    Thread.sleep(1000); // Sleep for 1 second
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         });
-
-        qrGenerationThread.setDaemon(true);
-        qrGenerationThread.start();
+        checkerThread.setDaemon(true);
+        checkerThread.start();
     }
 
-    private Image generateQRCode() {
-        File file = new File("whatsapp/qrcode.png");
-        if (file.exists()) {
-            return new Image(file.toURI().toString());
+    private void sendTestMsg() {
+        var chat = localBot.getApi().store()
+                .findChatByName(localBot.getRecipientName())
+                .orElseThrow(() -> new NoSuchElementException("Chat not found..."));
+        localBot.getApi().sendMessage(chat, "Test message for Garage Sale Manager");
+
+    }
+
+
+    private void refreshQR() {
+        if (!localBot.isConnected()) {
+            localBot.initializeWhatsappApi(); // This will generate a new QR code and update the path
+            setQrCodeImageView(); // Refresh the ImageView with the new QR code
         } else {
-            // Optionally, return a placeholder image if the QR code is not yet available
-            return new Image("file:placeholder.png"); // Replace with a valid placeholder image path
+            showAlert("Cannot Refresh QR Code", "You are already connected.");
         }
     }
 
-    private void startStatusCheckThread() {
-        statusCheckThread = new Thread(() -> {
-            while (isDialogOpen.get()) {
-                try {
-                    File statusFile = new File("whatsapp/status.txt");
-                    if (statusFile.exists()) {
-                        String status = new String(Files.readAllBytes(Paths.get(statusFile.toURI())));
-                        if (status.trim().equals("connected")) {
-                            Platform.runLater(() -> {
-                                logStatus.setText("Connected");
-                                logStatus.setStyle("-fx-text-fill: #02a402;");
-                            });
 
-                            break;
-                        }
-                    }
-                    Thread.sleep(1000); // Check every second
-                } catch (IOException | InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
 
-        statusCheckThread.setDaemon(true);
-        statusCheckThread.start();
-    }
-
-    public void setStorage(Storage storage) {
-        this.storage = storage;
-    }
-
-    private void sendTestMessage(String message, String recipientId) throws Exception {
-        URL url = new URL("http://127.0.0.1:3000/sendTest");
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Content-Type", "application/json; utf-8");
-        conn.setRequestProperty("Accept", "application/json");
-        conn.setDoOutput(true);
-
-        String jsonInputString = "{\"customMessage\": \"" + message + "\", \"recipientId\": \"" + recipientId + "\"}";
-
-        try (OutputStream os = conn.getOutputStream()) {
-            byte[] input = jsonInputString.getBytes("utf-8");
-            os.write(input, 0, input.length);
-        }
-
-        int code = conn.getResponseCode();
-        System.out.println("Response code: " + code);
-    }
 }

@@ -1,5 +1,6 @@
 package cc.pachuchi.garagesalemanager;
 
+import it.auties.whatsapp.model.message.standard.ImageMessageSimpleBuilder;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXMLLoader;
@@ -9,25 +10,24 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.shape.Circle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.fxml.FXML;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class listItemsViewController {
 
     private Storage storage;
-
-    private Thread statusCheckThread;
     private AtomicBoolean isDialogOpen = new AtomicBoolean(true);
+    private boolean wasBotEnabled = false; // Track the previous state of the bot
 
     private Stage stage;
     private Scene scene;
@@ -69,11 +69,13 @@ public class listItemsViewController {
     private Label warningMsg;
     @FXML
     private Label logStatus;
-
-
-
+    private ChatBot localBot;
 
     public void initialize() {
+        localBot = ChatBot.getInstance(); // Get the singleton instance
+        localBot.initializeWhatsappApi();
+        startChecking();
+
         addItemButton.setOnAction(event -> openAddItemDialog());
         itemDateAddedColumn.setCellValueFactory(new PropertyValueFactory<Item, String>("date"));
         itemReservationDateColumn.setCellValueFactory(new PropertyValueFactory<Item, LocalDate>("reservationDate"));
@@ -131,15 +133,10 @@ public class listItemsViewController {
             }
         });
 
-
-
-
-
         editItemButton.setOnAction(event -> {
             Item selectedItem = tableView.getSelectionModel().getSelectedItem();
             if (selectedItem != null) {
                 openEditItemDialog(selectedItem);
-
             } else {
                 warningMsg.setText("No item selected.");
                 Effects.fadeOutText(warningMsg, 1.5);
@@ -157,7 +154,6 @@ public class listItemsViewController {
                 Effects.fadeOutText(warningMsg, 1.5);
             }
         });
-
 
         reserveItemButton.setOnAction(event -> {
             Item selectedItem = tableView.getSelectionModel().getSelectedItem();
@@ -180,7 +176,6 @@ public class listItemsViewController {
                 Effects.fadeOutText(warningMsg, 1.5);
             }
         });
-        startStatusCheckThread();
     }
 
     private void openDetailItemDialog(Item selectedItem) {
@@ -234,7 +229,7 @@ public class listItemsViewController {
         }
     }
 
-    public void openEditItemDialog(Item selectedItem){
+    public void openEditItemDialog(Item selectedItem) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("editItemDialog.fxml"));
             Parent dialogRoot = loader.load();
@@ -253,7 +248,6 @@ public class listItemsViewController {
             e.printStackTrace();
         }
     }
-
 
     public void openRemoveItemDialog(Item selectedItem) {
         try {
@@ -280,8 +274,7 @@ public class listItemsViewController {
         }
     }
 
-
-    public void openReserveItemDialog(Item selectedItem){
+    public void openReserveItemDialog(Item selectedItem) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("reserveItemDialog.fxml"));
             Parent dialogRoot = loader.load();
@@ -331,33 +324,96 @@ public class listItemsViewController {
         }
     }
 
+    private void updateConnectionStatus() {
+        if (localBot.isConnected()) {
+            logStatus.setText("Connected");
+            logStatus.setStyle("-fx-text-fill: green;");
+        } else {
+            logStatus.setText("Disconnected");
+            logStatus.setStyle("-fx-text-fill: red;");
+        }
+    }
 
-    private void startStatusCheckThread() {
-        statusCheckThread = new Thread(() -> {
-            while (isDialogOpen.get()) {
-                try {
-                    File statusFile = new File("whatsapp/status.txt");
-                    if (statusFile.exists()) {
-                        String status = new String(Files.readAllBytes(Paths.get(statusFile.toURI())));
-                        if (status.trim().equals("connected")) {
-                            Platform.runLater(() -> {
-                                logStatus.setStyle("-fx-text-fill: #02a402;");
+    public void startChecking() {
+        Thread checkerThread = new Thread(() -> {
+            while (true) {
+                Platform.runLater(() -> {
+                    updateConnectionStatus();
+                    boolean isBotEnabled = localBot.isEnabled();
 
-                            });
-
-                            break;
-                        }
+                    if (isBotEnabled && !wasBotEnabled) {
+                        // The bot has just been enabled, start sending messages
+                        startSendingMessages();
+                        wasBotEnabled = true;
+                    } else if (!isBotEnabled && wasBotEnabled) {
+                        // The bot has just been disabled
+                        wasBotEnabled = false;
                     }
-                    Thread.sleep(1000); // Check every second
-                } catch (IOException | InterruptedException e) {
+                });
+                try {
+                    Thread.sleep(1000); // Sleep for 1 second
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         });
 
-        statusCheckThread.setDaemon(true);
-        statusCheckThread.start();
+        checkerThread.setDaemon(true);
+        checkerThread.start();
     }
 
+    public void startSendingMessages() {
+        Thread messageSenderThread = new Thread(() -> {
+            while (true) {
+                try {
+                    LocalTime currentTime = LocalTime.now();
+                    LocalTime startTime = LocalTime.of(localBot.getStartTimeHour(), localBot.getStartTimeMinutes());
+                    LocalTime endTime = LocalTime.of(localBot.getEndTimeHour(), localBot.getEndTimeMinutes());
 
+                    if (currentTime.isAfter(startTime) && currentTime.isBefore(endTime)) {
+                        System.out.println("Within time limits, starting client messaging...");
+
+                        if (!localBot.isConnected()) {
+                            System.out.println("Not connected. Attempting to reconnect...");
+                            localBot.initializeWhatsappApi(); // Reinitialize the API to attempt reconnection
+                        }
+
+                        List<Item> items = storage.getItems();
+                        if (items.isEmpty()) {
+                            System.out.println("No items available to send.");
+                        } else {
+                            Random random = new Random();
+                            Item randomItem = items.get(random.nextInt(items.size()));
+
+                            // Setup for messaging
+                            var chat = localBot.getApi().store()
+                                    .findChatByName(localBot.getRecipientName())
+                                    .orElseThrow(() -> new NoSuchElementException("Contact doesn't exist!"));
+//                            localBot.getApi().sendMessage(chat, randomItem.getName());
+                            var image = new ImageMessageSimpleBuilder()
+                                    .media(randomItem.getImageData())
+                                    .caption(randomItem.getName() + '\n' + randomItem.getDescription() + '\n' + randomItem.getPrice())
+                                    .build();
+                            localBot.getApi().sendMessage(chat, image);
+                            System.out.println("Sent item: " + randomItem.getName());
+                        }
+
+                        // Respect the interval for sending messages
+                        Thread.sleep(localBot.getInterval() * 60 * 1000);
+                    } else {
+                        // If outside the time window, just sleep for a short time before checking again
+                        Thread.sleep(1000);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.out.println("Failed to send message.");
+                }
+            }
+        });
+
+        messageSenderThread.setDaemon(true);
+        messageSenderThread.start();
+    }
 }
