@@ -12,7 +12,7 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="322.0" prefWidth="471.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cc.pachuchi.garagesalemanager.reserveItemDialogController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="322.0" prefWidth="471.0" styleClass="mainBorderPane" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cc.pachuchi.garagesalemanager.reserveItemDialogController">
     <bottom>
         <HBox alignment="CENTER" prefHeight="40.0" prefWidth="410.0" spacing="100.0" BorderPane.alignment="CENTER">
             <children>
@@ -23,18 +23,18 @@
         </HBox>
     </bottom>
     <center>
-        <AnchorPane prefHeight="208.0" prefWidth="472.0" BorderPane.alignment="CENTER">
+        <AnchorPane prefHeight="208.0" prefWidth="472.0" stylesheets="@styles.css" BorderPane.alignment="CENTER">
             <children>
             <Label layoutX="38.0" layoutY="13.0" text="Item Name: " />
             <Label layoutX="59.0" layoutY="34.0" text="Item ID:" />
             <Label layoutX="64.0" layoutY="76.0" text="Buyer: " />
             <Label layoutX="65.0" layoutY="115.0" prefWidth="38.0" text="Place:" />
-            <Label fx:id="itemName" layoutX="105.0" layoutY="13.0" prefHeight="17.0" prefWidth="311.0" style="-fx-background-color: #dbdbdb;">
+            <Label fx:id="itemName" layoutX="105.0" layoutY="13.0" prefHeight="17.0" prefWidth="311.0" styleClass="infoSpace">
                <font>
                   <Font name="System Bold" size="13.0" />
                </font>
             </Label>
-            <Label fx:id="itemID" layoutX="105.0" layoutY="34.0" prefHeight="17.0" prefWidth="311.0" style="-fx-background-color: #dbdbdb;">
+            <Label fx:id="itemID" layoutX="105.0" layoutY="34.0" prefHeight="17.0" prefWidth="311.0" styleClass="infoSpace">
                <font>
                   <Font name="System Italic" size="13.0" />
                </font>
