@@ -42,7 +42,10 @@ public class whatsAppDialogController {
     private Button saveSettings;
     @FXML
     private Button refreshQRButton;
+    @FXML
+    private Button deleteUserDataButton;
     private ChatBot localBot;
+
 
     public void initialize() {
         localBot = ChatBot.getInstance();
@@ -66,6 +69,7 @@ public class whatsAppDialogController {
         saveSettings.setOnAction(event -> saveChatBotSettings());
         testMsg.setOnAction(actionEvent -> sendTestMsg());
         refreshQRButton.setOnAction(actionEvent -> refreshQR());
+        deleteUserDataButton.setOnAction(actionEvent -> deleteUserData());
 
         // Populate hours
         for (int i = 0; i < 24; i++) {
@@ -83,6 +87,10 @@ public class whatsAppDialogController {
 
         // Start checking for connection status and QR code updates
         startChecking();
+    }
+
+    private void deleteUserData() {
+        localBot.getApi().logout();
     }
 
     public void cancelAction() {

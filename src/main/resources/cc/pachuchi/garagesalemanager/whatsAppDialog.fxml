@@ -11,21 +11,12 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-
 <?import org.kordamp.ikonli.javafx.FontIcon?>
+
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cc.pachuchi.garagesalemanager.whatsAppDialogController">
    <children>
       <Label layoutX="24.0" layoutY="314.0" text="Status: " />
       <Label fx:id="logStatus" layoutX="68.0" layoutY="314.0" text="Waiting for connection...." textFill="#ed9600" />
-      <HBox alignment="CENTER" layoutY="363.0" prefHeight="35.0" prefWidth="606.0" spacing="40.0">
-         <children>
-            <Button fx:id="cancelButton" mnemonicParsing="false" text="Ok" />
-            <Button fx:id="testMsg" mnemonicParsing="false" text="Send Test Message" />
-         </children>
-         <opaqueInsets>
-            <Insets />
-         </opaqueInsets>
-      </HBox>
       <AnchorPane layoutX="10.0" layoutY="11.0" prefHeight="124.0" prefWidth="156.0" style="-fx-background-color: e9e9e9; -fx-background-radius: 5; -fx-border-color: e9e9e9; -fx-border-radius: 5;">
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -108,11 +99,35 @@
       <HBox alignment="CENTER_LEFT" layoutX="39.0" layoutY="261.0" prefHeight="32.0" prefWidth="200.0" spacing="10.0">
          <children>
             <Label text="Scan QR-Code" />
-            <Button fx:id="refreshQRButton" mnemonicParsing="false" styleClass="material-symbols" >
+            <Button fx:id="refreshQRButton" mnemonicParsing="false" styleClass="material-symbols">
                <graphic>
                   <FontIcon iconLiteral="fas-sync-alt" iconSize="20" />
                </graphic>
             </Button>
+         </children>
+      </HBox>
+      <HBox layoutX="14.0" layoutY="359.0" prefHeight="40.0" prefWidth="548.0">
+         <children>
+            <HBox alignment="CENTER" prefHeight="35.0" prefWidth="274.0" spacing="40.0">
+               <children>
+                  <Button fx:id="cancelButton" mnemonicParsing="false" text="Ok" />
+                  <Button fx:id="testMsg" mnemonicParsing="false" text="Send Test Message" />
+               </children>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <Button  fx:id="deleteUserDataButton" mnemonicParsing="false" >
+                     <graphic>
+                        <FontIcon iconLiteral="fas-trash-alt" iconSize="20" />
+                     </graphic>
+                  </Button>
+
+
+               </children>
+            </HBox>
          </children>
       </HBox>
    </children>
