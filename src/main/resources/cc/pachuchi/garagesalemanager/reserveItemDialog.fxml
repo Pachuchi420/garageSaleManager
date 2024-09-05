@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -44,11 +44,11 @@
             <TextArea fx:id="itemPlace" layoutX="104.0" layoutY="115.0" prefHeight="86.0" prefWidth="313.0" />
             <Label fx:id="itemBuyerWarning" layoutX="105.0" layoutY="98.0" prefHeight="17.0" prefWidth="123.0" textFill="RED" />
             <Label fx:id="itemPlaceWarning" layoutX="102.0" layoutY="216.0" prefHeight="17.0" prefWidth="129.0" textFill="RED" />
-            <Spinner fx:id="itemHour" layoutX="233.0" layoutY="242.0" prefHeight="26.0" prefWidth="56.0" />
-            <Spinner fx:id="itemMinutes" layoutX="297.0" layoutY="242.0" prefHeight="26.0" prefWidth="56.0" />
             <DatePicker fx:id="itemDate" layoutX="30.0" layoutY="242.0" prefHeight="26.0" prefWidth="150.0" />
             <Label layoutX="30.0" layoutY="224.0" prefWidth="38.0" text="Date:" />
             <Label fx:id="itemDateWarning" layoutX="36.0" layoutY="247.0" prefHeight="17.0" prefWidth="123.0" textFill="RED" />
+            <ComboBox fx:id="itemHour" layoutX="208.0" layoutY="243.0" prefHeight="25.0" prefWidth="84.0" promptText="Hour" />
+            <ComboBox fx:id="itemMinutes" layoutX="303.0" layoutY="243.0" prefHeight="25.0" prefWidth="103.0" promptText="Minutes" />
             </children>
         </AnchorPane>
     </center>

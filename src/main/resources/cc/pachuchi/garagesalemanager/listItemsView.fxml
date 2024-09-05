@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="769.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cc.pachuchi.garagesalemanager.listItemsViewController">
    <center>
@@ -35,21 +35,55 @@
          <children>
             <AnchorPane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
                <children>
-                  <Label fx:id="warningMsg" alignment="CENTER" layoutX="262.0" layoutY="13.0" prefHeight="17.0" prefWidth="201.0" textFill="RED" />
-                  <Button fx:id="reserveItemButton" layoutX="14.0" layoutY="9.0" mnemonicParsing="false" text="Reservation" />
-                  <Button fx:id="detailItemButton" layoutX="110.0" layoutY="9.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="20.0" text="...">
-                     <font>
-                        <Font name="System Bold" size="13.0" />
-                     </font></Button>
-                  <Button fx:id="whatsAppButton" layoutX="150.0" layoutY="9.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="90.0" text="WhatsApp" />
-                  <Label fx:id="logStatus" layoutX="243.0" layoutY="13.0" text="●" textFill="#ed9600" />
+                  <Label fx:id="warningMsg" alignment="CENTER" layoutX="231.0" layoutY="14.0" prefHeight="17.0" prefWidth="201.0" textFill="RED" />
+
+                   <Label fx:id="logStatus" layoutX="202.0" layoutY="14.0"  >
+                   </Label>
+
+
+                  <ButtonBar buttonMinWidth="50.0" layoutY="3.0" prefHeight="40.0" prefWidth="173.0">
+                     <buttons>
+                         <Button fx:id="reserveItemButton" mnemonicParsing="false">
+                             <graphic>
+                                 <FontIcon iconLiteral="fas-sticky-note" iconSize="20" />
+                             </graphic>
+                         </Button>
+                        <Button fx:id="detailItemButton" mnemonicParsing="false" prefHeight="25.0">
+                           <graphic>
+                               <FontIcon iconLiteral="fas-info-circle" iconSize="20" />
+                           </graphic>
+                        </Button>
+      
+                         <Button fx:id="whatsAppButton" minWidth="0.0" mnemonicParsing="false" prefHeight="25.0">
+                             <graphic>
+                                 <FontIcon iconLiteral="fab-whatsapp" iconSize="20" />
+                             </graphic>
+                         </Button>
+                     </buttons>
+                  </ButtonBar>
                </children>
             </AnchorPane>
-            <ButtonBar prefHeight="40.0" prefWidth="200.0">
+            <ButtonBar buttonMinWidth="50.0" prefHeight="40.0" prefWidth="200.0">
               <buttons>
-                <Button fx:id="addItemButton" mnemonicParsing="false" text="Add" />
-                  <Button fx:id="editItemButton" mnemonicParsing="false" text="Edit" />
-                  <Button fx:id="removeItemButton" mnemonicParsing="false" text="Remove" />
+                  <Button fx:id="addItemButton" minWidth="41.0" mnemonicParsing="false" prefHeight="26.0">
+                  <graphic>
+                      <FontIcon iconLiteral="fas-plus" iconSize="15" />
+                  </graphic>
+                  </Button>
+
+
+                  <Button fx:id="removeItemButton" mnemonicParsing="false">
+                      <graphic>
+                          <FontIcon iconLiteral="fas-minus" iconSize="15" />
+                      </graphic>
+                  </Button>
+
+                  <Button fx:id="editItemButton" mnemonicParsing="false" prefHeight="26.0">
+                      <graphic>
+                          <FontIcon iconLiteral="fas-edit" iconSize="15" />
+                      </graphic>
+                  </Button>
+
               </buttons>
                <padding>
                   <Insets right="10.0" />

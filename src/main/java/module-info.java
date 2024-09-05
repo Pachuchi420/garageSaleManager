@@ -3,6 +3,7 @@ module cc.pachuchi.garagesalemanager {
     requires javafx.fxml;
     requires java.prefs;
     requires it.auties.cobalt;
+    requires org.kordamp.ikonli.javafx;
 
 
     opens cc.pachuchi.garagesalemanager to javafx.fxml;

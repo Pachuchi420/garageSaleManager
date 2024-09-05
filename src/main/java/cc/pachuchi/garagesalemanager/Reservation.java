@@ -2,20 +2,22 @@ package cc.pachuchi.garagesalemanager;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public class Reservation implements Serializable {
     private String buyer;
     private String place;
     private LocalDate date;
     private Boolean reserved;
-
+    private int hour;   // New field to store the hour
+    private int minute; // New field to store the minute
 
     public Reservation(String buyer, String place, LocalDate date, Boolean reserved){
         this.buyer = buyer;
         this.place = place;
         this.date = date;
         this.reserved = reserved;
+        this.hour = 0;   // Default hour to 0
+        this.minute = 0; // Default minute to 0
     }
 
     public String getBuyer() {
@@ -34,7 +36,10 @@ public class Reservation implements Serializable {
         this.place = place;
     }
 
-    public void setDate(LocalDate date){this.date = date;}
+    public void setDate(LocalDate date){
+        this.date = date;
+    }
+
     public LocalDate getDate() {
         return date;
     }
@@ -47,12 +52,28 @@ public class Reservation implements Serializable {
         this.reserved = reserved;
     }
 
-    public void undoReservation() {
+    public int getHour() {
+        return hour;
+    }
 
+    public void setHour(int hour) {
+        this.hour = hour;
+    }
+
+    public int getMinute() {
+        return minute;
+    }
+
+    public void setMinute(int minute) {
+        this.minute = minute;
+    }
+
+    public void undoReservation() {
         this.buyer = null;
         this.place = null;
         this.date = null;
         this.reserved = false;
+        this.hour = 0;
+        this.minute = 0;
     }
-
 }

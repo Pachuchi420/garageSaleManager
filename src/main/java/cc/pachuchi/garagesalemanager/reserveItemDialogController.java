@@ -33,6 +33,10 @@ public class reserveItemDialogController {
     private Button reserveButton;
     @FXML
     private Button undoReservationButton;
+    @FXML
+    private ComboBox<String> itemHour;
+    @FXML
+    private ComboBox<String> itemMinutes;
 
     public void initialize() {
         reserveButton.setOnAction(event -> editReservation());
@@ -55,12 +59,27 @@ public class reserveItemDialogController {
                 };
             }
         });
+
+
+        // Populate hours
+        for (int i = 0; i < 24; i++) {
+            String hour = String.format("%02d", i);
+            itemHour.getItems().add(hour);
+        }
+
+        // Populate minutes
+        for (int i = 0; i < 60; i += 5) { // Every 5 minutes
+            String minute = String.format("%02d", i);
+            itemMinutes.getItems().add(minute);
+        }
     }
 
     private void editReservation() {
         String buyer = itemBuyer.getText();
         String place = itemPlace.getText();
         LocalDate date = itemDate.getValue();
+        int itemHourValue = Integer.parseInt(itemHour.getValue());
+        int itemMinutesValue = Integer.parseInt(itemMinutes.getValue());
 
         if (buyer.isEmpty()) {
             itemBuyerWarning.setText("Can't be empty");
@@ -74,11 +93,13 @@ public class reserveItemDialogController {
             return;
         }
 
-
         selectedItem.getReservation().setReserved(true);
         selectedItem.getReservation().setBuyer(buyer);
         selectedItem.getReservation().setPlace(place);
         selectedItem.getReservation().setDate(date);
+        selectedItem.getReservation().setHour(itemHourValue);   // Save the hour
+        selectedItem.getReservation().setMinute(itemMinutesValue); // Save the minute
+
         storage.saveItems();
         Stage stage = (Stage) reserveButton.getScene().getWindow();
         stage.close();
@@ -94,7 +115,15 @@ public class reserveItemDialogController {
         itemID.setText(selectedItem.getId());
         itemBuyer.setText(selectedItem.getReservation().getBuyer());
         itemPlace.setText(selectedItem.getReservation().getPlace());
+        itemDate.setValue(selectedItem.getReservation().getDate());
 
+        // Set the hour and minute in the ComboBox
+        if (selectedItem.getReservation().getHour() >= 0) {
+            itemHour.setValue(String.format("%02d", selectedItem.getReservation().getHour()));
+        }
+        if (selectedItem.getReservation().getMinute() >= 0) {
+            itemMinutes.setValue(String.format("%02d", selectedItem.getReservation().getMinute()));
+        }
     }
 
     public void cancelAction() {

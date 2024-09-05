@@ -13,6 +13,9 @@ import javafx.scene.image.ImageView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.fxml.FXML;
+import org.kordamp.ikonli.javafx.FontIcon;
+import javafx.scene.paint.Color;
+
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -325,12 +328,16 @@ public class listItemsViewController {
     }
 
     private void updateConnectionStatus() {
+        FontIcon statusIcon = new FontIcon(); // Create a FontIcon object
+
         if (localBot.isConnected()) {
-            logStatus.setText("Connected");
-            logStatus.setStyle("-fx-text-fill: green;");
+            statusIcon.setIconLiteral("fas-circle");  // Set icon to checkmark for connected status
+            statusIcon.setIconColor(Color.GREEN);   // Set the color to green
+            logStatus.setGraphic(statusIcon);       // Set the graphic to the label
         } else {
-            logStatus.setText("Disconnected");
-            logStatus.setStyle("-fx-text-fill: red;");
+            statusIcon.setIconLiteral("far-circle");  // Set icon to cross for disconnected status
+            statusIcon.setIconColor(Color.RED);     // Set the color to red
+            logStatus.setGraphic(statusIcon);       // Set the graphic to the label
         }
     }
 
@@ -389,7 +396,7 @@ public class listItemsViewController {
                             var chat = localBot.getApi().store()
                                     .findChatByName(localBot.getRecipientName())
                                     .orElseThrow(() -> new NoSuchElementException("Contact doesn't exist!"));
-//                            localBot.getApi().sendMessage(chat, randomItem.getName());
+
                             var image = new ImageMessageSimpleBuilder()
                                     .media(randomItem.getImageData())
                                     .caption(randomItem.getName() + '\n' + randomItem.getDescription() + '\n' + randomItem.getPrice())
