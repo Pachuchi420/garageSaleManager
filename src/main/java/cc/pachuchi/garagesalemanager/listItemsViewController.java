@@ -72,6 +72,8 @@ public class listItemsViewController {
     private Label warningMsg;
     @FXML
     private Label logStatus;
+    @FXML
+    private Button setSoldButton;
     private ChatBot localBot;
 
     public void initialize() {
@@ -146,6 +148,7 @@ public class listItemsViewController {
             }
         });
 
+
         whatsAppButton.setOnAction(event -> openWhatsAppDialog());
 
         removeItemButton.setOnAction(event -> {
@@ -179,7 +182,30 @@ public class listItemsViewController {
                 Effects.fadeOutText(warningMsg, 1.5);
             }
         });
+
+        setSoldButton.setOnAction(event -> {
+            Item selectedItem = tableView.getSelectionModel().getSelectedItem();
+            if (selectedItem != null && !selectedItem.getSold()) {
+                selectedItem.setSold(true);
+                storage.saveItems();
+                setSoldButton.setStyle("-fx-icon-color: #bc1919"); // Corrected color code
+                setSoldButton.applyCss();
+                refreshTableView();
+            } else if (selectedItem != null && selectedItem.getSold()) {
+                selectedItem.setSold(false);
+                setSoldButton.setStyle("-fx-icon-color: #45932b"); // Green for unsold state
+                setSoldButton.applyCss();
+                storage.saveItems();
+                refreshTableView();
+            } else {
+                warningMsg.setText("No item selected.");
+                Effects.fadeOutText(warningMsg, 1.5);
+            }
+        });
     }
+
+
+
 
     private void openDetailItemDialog(Item selectedItem) {
         try {
@@ -332,11 +358,11 @@ public class listItemsViewController {
 
         if (localBot.isConnected()) {
             statusIcon.setIconLiteral("fas-circle");  // Set icon to checkmark for connected status
-            statusIcon.setIconColor(Color.GREEN);   // Set the color to green
+            statusIcon.setIconColor(Color.rgb(69,147,43));   // Set the color to green
             logStatus.setGraphic(statusIcon);       // Set the graphic to the label
         } else {
             statusIcon.setIconLiteral("far-circle");  // Set icon to cross for disconnected status
-            statusIcon.setIconColor(Color.RED);     // Set the color to red
+            statusIcon.setIconColor(Color.rgb(188,25 ,25));     // Set the color to red
             logStatus.setGraphic(statusIcon);       // Set the graphic to the label
         }
     }

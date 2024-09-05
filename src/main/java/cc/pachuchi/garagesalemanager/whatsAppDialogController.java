@@ -181,7 +181,7 @@ public class whatsAppDialogController {
             // Update the toggle button text and style based on its state
             if (isActive) {
                 activeToggleButton.setText("Enabled");
-                activeToggleButton.setStyle("-fx-background-color: green; -fx-text-fill: white;");
+                activeToggleButton.setStyle("-fx-background-color: #45932b; -fx-text-fill: white;");
             } else {
                 activeToggleButton.setText("Disabled");
                 activeToggleButton.setStyle("-fx-background-color: #bc1919; -fx-text-fill: white;");
@@ -214,10 +214,12 @@ public class whatsAppDialogController {
             logStatus.setText("Connected");
             logStatus.setStyle("-fx-text-fill: green;");
             refreshQRButton.setDisable(true);
+            deleteUserDataButton.setDisable(false);
         } else {
             logStatus.setText("Disconnected");
             logStatus.setStyle("-fx-text-fill: red;");
             refreshQRButton.setDisable(false);
+            deleteUserDataButton.setDisable(true);
         }
     }
 

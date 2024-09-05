@@ -9,22 +9,15 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cc.pachuchi.garagesalemanager.whatsAppDialogController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="mainBorderPane" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cc.pachuchi.garagesalemanager.whatsAppDialogController">
    <children>
       <Label layoutX="24.0" layoutY="314.0" text="Status: " />
       <Label fx:id="logStatus" layoutX="68.0" layoutY="314.0" text="Waiting for connection...." textFill="#ed9600" />
-      <AnchorPane layoutX="10.0" layoutY="11.0" prefHeight="124.0" prefWidth="156.0" style="-fx-background-color: e9e9e9; -fx-background-radius: 5; -fx-border-color: e9e9e9; -fx-border-radius: 5;">
-         <padding>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-         </padding>
-         <children>
-            <ImageView fx:id="whatsappQRCode" fitHeight="218.0" fitWidth="235.0" layoutX="11.0" layoutY="11.0" pickOnBounds="true" preserveRatio="true" />
-         </children>
-      </AnchorPane>
       <VBox layoutX="286.0" layoutY="14.0" prefHeight="330.0" prefWidth="306.0">
          <children>
             <HBox prefHeight="32.0" prefWidth="306.0" spacing="10.0">
@@ -106,7 +99,7 @@
             </Button>
          </children>
       </HBox>
-      <HBox layoutX="14.0" layoutY="359.0" prefHeight="40.0" prefWidth="548.0">
+      <HBox layoutX="14.0" layoutY="359.0" prefHeight="40.0" prefWidth="548.0" spacing="100.0">
          <children>
             <HBox alignment="CENTER" prefHeight="35.0" prefWidth="274.0" spacing="40.0">
                <children>
@@ -119,16 +112,33 @@
             </HBox>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <Button  fx:id="deleteUserDataButton" mnemonicParsing="false" >
-                     <graphic>
-                        <FontIcon iconLiteral="fas-trash-alt" iconSize="20" />
-                     </graphic>
-                  </Button>
+                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Label text="Logout">
+                           <padding>
+                              <Insets bottom="3.0" />
+                           </padding>
+                        </Label>
+                        <Button fx:id="deleteUserDataButton" mnemonicParsing="false">
+                           <graphic>
+                              <FontIcon iconLiteral="fas-sign-out-alt" iconSize="20" />
+                           </graphic>
+                        </Button>
+                     </children>
+                     <padding>
+                        <Insets bottom="8.0" />
+                     </padding>
+                  </VBox>
 
 
                </children>
             </HBox>
          </children>
       </HBox>
+      <StackPane layoutX="15.0" layoutY="7.0" prefHeight="247.0" prefWidth="261.0" styleClass="imageContainer">
+         <children>
+            <ImageView fx:id="whatsappQRCode" fitHeight="218.0" fitWidth="235.0" pickOnBounds="true" preserveRatio="true" />
+         </children>
+      </StackPane>
    </children>
 </AnchorPane>

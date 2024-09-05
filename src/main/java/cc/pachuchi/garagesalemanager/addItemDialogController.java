@@ -1,9 +1,5 @@
 package cc.pachuchi.garagesalemanager;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Button;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.fxml.FXML;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -50,11 +46,18 @@ public class addItemDialogController {
     private Button confirmButton;
     @FXML
     private Button cancelButton;
+    private ToggleGroup currencyGroup;
 
 
 
 
     public void initialize() {
+        currencyGroup = new ToggleGroup();
+
+        currencyUSD.setToggleGroup(currencyGroup);
+        currencyMXN.setToggleGroup(currencyGroup);
+        currencyEUR.setToggleGroup(currencyGroup);
+
         selectImageButton.setOnAction(event -> selectImage());
         confirmButton.setOnAction(event -> addItem());
         cancelButton.setOnAction(event-> cancelAction());
